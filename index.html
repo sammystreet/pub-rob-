@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Robert's 35 Splooge Counter</title>
+  <title>Robert's Countdown Goal</title>
   <style>
     /* General Layout */
     body {
       font-family: 'Arial', sans-serif;
       margin: 0;
       padding: 0;
-      background: black; /* Changed background to black */
-      color: white; /* Changed default text color to white */
+      background: linear-gradient(to right, #e1e1e1, #f7f7f7);
+      color: #333;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -21,14 +21,14 @@
 
     h1 {
       font-size: 2rem;
-      color: white; /* Updated heading to white */
+      color: #333;
       margin-top: 1rem;
     }
 
     #countdown {
       font-size: 1.5rem;
       margin: 20px 0;
-      color: white; /* Updated text color to white */
+      color: #333;
     }
 
     /* Task Bubbles and Layout */
@@ -51,7 +51,7 @@
     .column h2 {
       margin-bottom: 10px;
       font-size: 1.5rem;
-      color: white; /* Updated column headings to white */
+      color: #1976d2; /* Blue header */
     }
 
     .bubble {
@@ -64,14 +64,14 @@
       width: 80%;
       border-radius: 25px;
       background-color: #1976d2; /* Blue bubble */
-      color: white; /* White text for the bubbles */
+      color: white; /* White text */
       box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.2);
       transition: background-color 0.3s ease, transform 0.2s;
     }
 
     .bubble.complete {
       background-color: #888; /* Grey for completed bubbles */
-      color: white; /* White text for completed bubbles */
+      color: white;
       text-decoration: line-through; /* Strike-through for completed tasks */
     }
 
@@ -99,7 +99,7 @@
       transform: translate(-50%, -50%);
       font-size: 2rem;
       background: rgba(255, 255, 255, 0.9);
-      color: black; /* Center text remains black for emphasis */
+      color: #333;
       padding: 30px;
       border-radius: 10px;
       text-align: center;
@@ -114,7 +114,7 @@
   </style>
 </head>
 <body>
-  <h1>Robert's 35 Splooge Counter</h1>
+  <h1>Robert's 35-Splooge Countdown</h1>
   <p id="countdown">Splooges Remaining: 35</p>
 
   <!-- Columns for To Go and Completed -->
