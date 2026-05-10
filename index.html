@@ -1,6 +1,3 @@
-# Updated `Index1.html`
-
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,29 +10,28 @@
       font-family: 'Arial', sans-serif;
       margin: 0;
       padding: 0;
-      background: black;
-      color: white;
+      background: black; /* Changed background to black */
+      color: white; /* Changed default text color to white */
       display: flex;
       flex-direction: column;
       align-items: center;
-      overflow-x: hidden;
-      overflow-y: auto;
+      height: 100vh;
+      overflow: hidden;
     }
 
     h1 {
-      font-size: 2.5rem;
-      color: white; /* Changed from yellow to white */
-      margin: 20px 0;
-      text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.9);
+      font-size: 2rem;
+      color: white; /* Updated heading to white */
+      margin-top: 1rem;
     }
 
     #countdown {
       font-size: 1.5rem;
-      margin: 20px;
-      color: white;
+      margin: 20px 0;
+      color: white; /* Updated text color to white */
     }
 
-    /* Columns */
+    /* Task Bubbles and Layout */
     .container {
       display: flex;
       justify-content: center;
@@ -49,12 +45,13 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      min-height: 300px;
     }
 
     .column h2 {
       margin-bottom: 10px;
       font-size: 1.5rem;
-      color: #3498db;
+      color: white; /* Updated column headings to white */
     }
 
     .bubble {
@@ -66,20 +63,31 @@
       padding: 10px 20px;
       width: 80%;
       border-radius: 25px;
-      background-color: #1976d2;
-      color: white;
-      box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.7);
+      background-color: #1976d2; /* Blue bubble */
+      color: white; /* White text for the bubbles */
+      box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.2);
       transition: background-color 0.3s ease, transform 0.2s;
     }
 
     .bubble.complete {
-      background-color: #888;
-      color: white;
-      text-decoration: line-through;
+      background-color: #888; /* Grey for completed bubbles */
+      color: white; /* White text for completed bubbles */
+      text-decoration: line-through; /* Strike-through for completed tasks */
     }
 
-    .bubble:hover:not(.complete) {
-      background-color: #1565c0;
+    .bubble:not(.complete):hover {
+      background-color: #1565c0; /* Dark blue hover effect */
+    }
+
+    /* Fireworks Canvas */
+    #fireworks-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 10;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
     }
 
     /* Completion Message */
@@ -91,10 +99,11 @@
       transform: translate(-50%, -50%);
       font-size: 2rem;
       background: rgba(255, 255, 255, 0.9);
-      color: black;
+      color: black; /* Center text remains black for emphasis */
       padding: 30px;
       border-radius: 10px;
       text-align: center;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
       z-index: 20;
     }
 
@@ -102,23 +111,13 @@
       color: #ff7043;
       font-weight: bold;
     }
-
-    /* Footer */
-    footer {
-      text-align: center;
-      padding: 15px;
-      margin-top: 30px;
-      color: white;
-      background: #222;
-      border-top: 3px solid #fff;
-    }
   </style>
 </head>
 <body>
   <h1>Robert's 35 Splooge Counter</h1>
   <p id="countdown">Splooges Remaining: 35</p>
 
-  <!-- Columns for To-Go and Completed -->
+  <!-- Columns for To Go and Completed -->
   <div class="container">
     <div class="column" id="to-go-column">
       <h2>To Go</h2>
@@ -133,9 +132,8 @@
     Congrats, you're <span>kid free</span>! Pump away, Tiger 🐅 😉!
   </div>
 
-  <footer>
-    Dads are the real MVPs! 💪
-  </footer>
+  <!-- Fireworks Canvas -->
+  <canvas id="fireworks-canvas"></canvas>
 
   <script>
     // Variables
@@ -143,40 +141,101 @@
     const completedColumn = document.getElementById("completed-column");
     const completionMessage = document.getElementById("completion-message");
     const countdown = document.getElementById("countdown");
+    const fireworksCanvas = document.getElementById("fireworks-canvas");
+    const ctx = fireworksCanvas.getContext("2d");
 
     let remainingSplooges = 35;
+    let continuousFireworks = false;
 
-    // Add bubbles to "To Go" column
+    // Add Splooges to "To Go" Column
     for (let i = 1; i <= 35; i++) {
-      const bubble = document.createElement("div");
-      bubble.textContent = `Splooge ${i}`;
-      bubble.dataset.id = i;
-      bubble.className = "bubble";
-      toGoColumn.appendChild(bubble);
+      const splooge = document.createElement('div');
+      splooge.className = 'bubble';
+      splooge.textContent = `Splooge ${i}`;
+      splooge.dataset.id = i;
+      toGoColumn.appendChild(splooge);
     }
 
-    // Handle Click Logic for Bubbles
-    document.querySelectorAll(".bubble").forEach((bubble) => {
-      bubble.addEventListener("click", () => {
-        const isComplete = bubble.classList.toggle("complete");
+    // Resize Fireworks Canvas
+    function resizeCanvas() {
+      fireworksCanvas.width = window.innerWidth;
+      fireworksCanvas.height = window.innerHeight;
+    }
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
+
+    // Fireworks Effect
+    const particles = [];
+    function createFirework(x, y) {
+      const colors = ['white']; // White fireworks
+      for (let i = 0; i < 50; i++) {
+        particles.push({
+          x,
+          y,
+          radius: Math.random() * 3 + 2,
+          color: colors[0],
+          speedX: (Math.random() - 0.5) * 10,
+          speedY: (Math.random() - 0.5) * 10,
+          alpha: 1,
+        });
+      }
+    }
+
+    function animateFireworks() {
+      ctx.clearRect(0, 0, fireworksCanvas.width, fireworksCanvas.height);
+      particles.forEach((particle, i) => {
+        ctx.beginPath();
+        ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+        ctx.fillStyle = particle.color;
+        ctx.globalAlpha = particle.alpha;
+        ctx.fill();
+
+        particle.x += particle.speedX;
+        particle.y += particle.speedY;
+        particle.alpha -= 0.02;
+
+        if (particle.alpha <= 0) {
+          particles.splice(i, 1);
+        }
+      });
+
+      if (continuousFireworks) {
+        // Continuously launch random fireworks across the screen
+        createFirework(
+          Math.random() * fireworksCanvas.width,
+          Math.random() * fireworksCanvas.height
+        );
+      }
+
+      requestAnimationFrame(animateFireworks);
+    }
+    animateFireworks();
+
+    // Handle Splooge Clicks
+    document.querySelectorAll(".bubble").forEach(splooge => {
+      splooge.addEventListener("click", () => {
+        const isComplete = splooge.classList.toggle("complete");
         if (isComplete) {
-          completedColumn.appendChild(bubble);
+          completedColumn.appendChild(splooge);
           remainingSplooges--;
         } else {
-          toGoColumn.appendChild(bubble);
+          toGoColumn.appendChild(splooge);
           remainingSplooges++;
         }
+
+        // Update Countdown
         countdown.textContent = `Splooges Remaining: ${remainingSplooges}`;
-        completionMessage.style.display = remainingSplooges === 0 ? "block" : "none";
+
+        // Toggle Completion Message & Fireworks
+        if (remainingSplooges === 0) {
+          completionMessage.style.display = "block";
+          continuousFireworks = true;
+        } else {
+          completionMessage.style.display = "none";
+          continuousFireworks = false;
+        }
       });
     });
   </script>
 </body>
 </html>
-```
-
-## Changes Made
-
-* Changed the main header font color from yellow to white
-* Removed the entire “Dad Themes / Random Dad Vibes” section from the bottom of the page
-* Kept everything else exactly the same
