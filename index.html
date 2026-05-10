@@ -1,3 +1,6 @@
+# Updated `Index1.html`
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,8 +13,8 @@
       font-family: 'Arial', sans-serif;
       margin: 0;
       padding: 0;
-      background: black; /* Black background for a dad-ish theme */
-      color: white; /* White text for readability */
+      background: black;
+      color: white;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -21,15 +24,15 @@
 
     h1 {
       font-size: 2.5rem;
-      color: #f1c40f; /* Golden yellow for heading */
+      color: white; /* Changed from yellow to white */
       margin: 20px 0;
-      text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.9); /* Classic bold style */
+      text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.9);
     }
 
     #countdown {
       font-size: 1.5rem;
       margin: 20px;
-      color: white; /* White text for countdown */
+      color: white;
     }
 
     /* Columns */
@@ -51,7 +54,7 @@
     .column h2 {
       margin-bottom: 10px;
       font-size: 1.5rem;
-      color: #3498db; /* Soft blue for h2 headings */
+      color: #3498db;
     }
 
     .bubble {
@@ -63,47 +66,20 @@
       padding: 10px 20px;
       width: 80%;
       border-radius: 25px;
-      background-color: #1976d2; /* Proud dad-blue for incomplete tasks */
+      background-color: #1976d2;
       color: white;
       box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.7);
       transition: background-color 0.3s ease, transform 0.2s;
     }
 
     .bubble.complete {
-      background-color: #888; /* Grey for completed tasks */
+      background-color: #888;
       color: white;
-      text-decoration: line-through; /* Strike-through for completed */
+      text-decoration: line-through;
     }
 
     .bubble:hover:not(.complete) {
-      background-color: #1565c0; /* Hover style for uncompleted tasks */
-    }
-
-    /* Dad-Themed Widgets Section */
-    .dad-themes {
-      margin: 20px 0;
-      padding: 20px;
-      text-align: center;
-      background: #333;
-      border-radius: 15px;
-      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
-    }
-
-    .dad-widget {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin: 10px 0;
-      background: #444;
-      padding: 15px;
-      border-radius: 10px;
-      color: #f1c40f; /* Gold for widgets */
-    }
-
-    .dad-widget img {
-      width: 40px;
-      height: 40px;
-      margin-right: 10px;
+      background-color: #1565c0;
     }
 
     /* Completion Message */
@@ -152,23 +128,6 @@
     </div>
   </div>
 
-  <!-- Dad-Themed Widgets Section -->
-  <div class="dad-themes">
-    <h2>Random Dad Vibes</h2>
-    <div class="dad-widget">
-      <img src="https://i.imgur.com/kAuAZV3.png" alt="Wrench">
-      <span>Duct tape fixes everything!</span>
-    </div>
-    <div class="dad-widget">
-      <img src="https://i.imgur.com/oYiT2N7.png" alt="Grill">
-      <span>Grill God in action. 🍔</span>
-    </div>
-    <div class="dad-widget">
-      <img src="https://i.imgur.com/VXN9d4F.png" alt="Remote control">
-      <span>Default TV operator 🎮</span>
-    </div>
-  </div>
-
   <!-- Completion Message -->
   <div class="completion-message" id="completion-message">
     Congrats, you're <span>kid free</span>! Pump away, Tiger 🐅 😉!
@@ -214,3 +173,10 @@
   </script>
 </body>
 </html>
+```
+
+## Changes Made
+
+* Changed the main header font color from yellow to white
+* Removed the entire “Dad Themes / Random Dad Vibes” section from the bottom of the page
+* Kept everything else exactly the same
