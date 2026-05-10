@@ -23,7 +23,7 @@
       font-weight: bold;
     }
 
-    .task {
+    .splooge {
       cursor: pointer;
       font-size: 18px;
       line-height: 2;
@@ -37,125 +37,108 @@
       transition: background-color 0.3s, color 0.3s;
     }
 
-    .task.complete {
+    .splooge.complete {
       background-color: #4caf50;
       color: white;
     }
 
-    .task:not(.complete):hover {
+    .splooge:not(.complete):hover {
       background-color: #e2e8f0;
     }
 
-    #fireworks {
+    #milk-splatter {
       position: fixed;
       top: 0;
       left: 0;
       z-index: 10;
       width: 100%;
       height: 100%;
+      background: transparent;
       pointer-events: none;
+    }
+
+    .splatter-animation {
+      position: absolute;
+      background-color: white;
+      border-radius: 50%;
+      pointer-events: none;
+      animation: splatter 0.8s ease-out forwards;
+    }
+
+    @keyframes splatter {
+      0% {
+        width: 0;
+        height: 0;
+        opacity: 1;
+      }
+      50% {
+        opacity: 0.8;
+      }
+      100% {
+        width: 300px;
+        height: 300px;
+        opacity: 0;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>Robert's 35-Task Countdown</h1>
-  <p id="countdown">Tasks Remaining: 35</p>
-  <div id="task-list">
-    <div class="task" data-task-id="1">Task 1</div>
-    <div class="task" data-task-id="2">Task 2</div>
-    <div class="task" data-task-id="3">Task 3</div>
-    <!-- Add more tasks dynamically using JS -->
+  <h1>Robert's 35-Splooge Countdown</h1>
+  <p id="countdown">Splooges Remaining: 35</p>
+  <div id="splooge-list">
+    <div class="splooge" data-splooge-id="1">Splooge 1</div>
+    <div class="splooge" data-splooge-id="2">Splooge 2</div>
+    <div class="splooge" data-splooge-id="3">Splooge 3</div>
+    <!-- Add more splooges dynamically using JS -->
   </div>
 
-  <canvas id="fireworks"></canvas>
+  <div id="milk-splatter"></div>
 
   <script>
-    // Generate 35 task elements
-    const taskList = document.getElementById('task-list');
+    // Generate 35 splooge elements
+    const sploogeList = document.getElementById('splooge-list');
     for (let i = 4; i <= 35; i++) {
-      const taskDiv = document.createElement('div');
-      taskDiv.className = 'task';
-      taskDiv.dataset.taskId = i;
-      taskDiv.textContent = `Task ${i}`;
-      taskList.appendChild(taskDiv);
+      const sploogeDiv = document.createElement('div');
+      sploogeDiv.className = 'splooge';
+      sploogeDiv.dataset.sploogeId = i;
+      sploogeDiv.textContent = `Splooge ${i}`;
+      sploogeList.appendChild(sploogeDiv);
     }
 
-    const tasks = document.querySelectorAll('.task');
+    const splooges = document.querySelectorAll('.splooge');
     const countdown = document.getElementById('countdown');
-    let remainingTasks = 35;
+    const milkSplatter = document.getElementById('milk-splatter');
+    let remainingSplooges = 35;
 
-    tasks.forEach(task => {
-      task.addEventListener('click', () => {
-        const isComplete = task.classList.toggle('complete');
-        remainingTasks += isComplete ? -1 : 1;
-        countdown.textContent = `Tasks Remaining: ${remainingTasks}`;
+    splooges.forEach(splooge => {
+      splooge.addEventListener('click', () => {
+        const isComplete = splooge.classList.toggle('complete');
+        remainingSplooges += isComplete ? -1 : 1;
+        countdown.textContent = `Splooges Remaining: ${remainingSplooges}`;
 
         if (isComplete) {
-          triggerFireworks();
+          triggerMilkSplatter();
         }
       });
     });
 
-    // Fireworks Effect
-    const canvas = document.getElementById('fireworks');
-    const ctx = canvas.getContext('2d');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    // Milk Splatter Effect
+    function triggerMilkSplatter() {
+      const splatter = document.createElement('div');
+      splatter.className = 'splatter-animation';
+      splatter.style.left = `${Math.random() * window.innerWidth}px`;
+      splatter.style.top = `${Math.random() * window.innerHeight / 2}px`;
 
-    const particles = [];
-    const colors = ['#ff595e', '#ffca3a', '#8ac926', '#1982c4', '#6a4c93'];
+      milkSplatter.appendChild(splatter);
 
-    function random(min, max) {
-      return Math.random() * (max - min) + min;
+      setTimeout(() => {
+        milkSplatter.removeChild(splatter);
+      }, 800); // Remove splatter after animation ends
     }
-
-    function createParticles(x, y) {
-      for (let i = 0; i < 50; i++) {
-        particles.push({
-          x,
-          y,
-          radius: random(2, 5),
-          color: colors[Math.floor(Math.random() * colors.length)],
-          speedX: random(-4, 4),
-          speedY: random(-4, 4),
-          alpha: 1
-        });
-      }
-    }
-
-    function drawParticles() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      particles.forEach((particle, index) => {
-        ctx.beginPath();
-        ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
-        ctx.fillStyle = particle.color;
-        ctx.globalAlpha = particle.alpha;
-        ctx.fill();
-
-        particle.x += particle.speedX;
-        particle.y += particle.speedY;
-        particle.alpha -= 0.02;
-
-        if (particle.alpha <= 0) {
-          particles.splice(index, 1);
-        }
-      });
-
-      requestAnimationFrame(drawParticles);
-    }
-
-    function triggerFireworks() {
-      const x = random(0, canvas.width);
-      const y = random(0, canvas.height / 2); // Fireworks appear in the upper half
-      createParticles(x, y);
-    }
-
-    drawParticles();
 
     window.addEventListener('resize', () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      milkSplatter.style.width = window.innerWidth + 'px';
+      milkSplatter.style.height = window.innerHeight + 'px';
     });
   </script>
 </body>
