@@ -10,28 +10,29 @@
       font-family: 'Arial', sans-serif;
       margin: 0;
       padding: 0;
-      background: black; /* Changed background to black */
-      color: white; /* Changed default text color to white */
+      background: black; /* Black background for a dad-ish theme */
+      color: white; /* White text for readability */
       display: flex;
       flex-direction: column;
       align-items: center;
-      height: 100vh;
-      overflow: hidden;
+      overflow-x: hidden;
+      overflow-y: auto;
     }
 
     h1 {
-      font-size: 2rem;
-      color: white; /* Updated heading to white */
-      margin-top: 1rem;
+      font-size: 2.5rem;
+      color: #f1c40f; /* Golden yellow for heading */
+      margin: 20px 0;
+      text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.9); /* Classic bold style */
     }
 
     #countdown {
       font-size: 1.5rem;
-      margin: 20px 0;
-      color: white; /* Updated text color to white */
+      margin: 20px;
+      color: white; /* White text for countdown */
     }
 
-    /* Task Bubbles and Layout */
+    /* Columns */
     .container {
       display: flex;
       justify-content: center;
@@ -45,13 +46,12 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      min-height: 300px;
     }
 
     .column h2 {
       margin-bottom: 10px;
       font-size: 1.5rem;
-      color: white; /* Updated column headings to white */
+      color: #3498db; /* Soft blue for h2 headings */
     }
 
     .bubble {
@@ -63,31 +63,47 @@
       padding: 10px 20px;
       width: 80%;
       border-radius: 25px;
-      background-color: #1976d2; /* Blue bubble */
-      color: white; /* White text for the bubbles */
-      box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.2);
+      background-color: #1976d2; /* Proud dad-blue for incomplete tasks */
+      color: white;
+      box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.7);
       transition: background-color 0.3s ease, transform 0.2s;
     }
 
     .bubble.complete {
-      background-color: #888; /* Grey for completed bubbles */
-      color: white; /* White text for completed bubbles */
-      text-decoration: line-through; /* Strike-through for completed tasks */
+      background-color: #888; /* Grey for completed tasks */
+      color: white;
+      text-decoration: line-through; /* Strike-through for completed */
     }
 
-    .bubble:not(.complete):hover {
-      background-color: #1565c0; /* Dark blue hover effect */
+    .bubble:hover:not(.complete) {
+      background-color: #1565c0; /* Hover style for uncompleted tasks */
     }
 
-    /* Fireworks Canvas */
-    #fireworks-canvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      z-index: 10;
-      width: 100vw;
-      height: 100vh;
-      pointer-events: none;
+    /* Dad-Themed Widgets Section */
+    .dad-themes {
+      margin: 20px 0;
+      padding: 20px;
+      text-align: center;
+      background: #333;
+      border-radius: 15px;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    .dad-widget {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 10px 0;
+      background: #444;
+      padding: 15px;
+      border-radius: 10px;
+      color: #f1c40f; /* Gold for widgets */
+    }
+
+    .dad-widget img {
+      width: 40px;
+      height: 40px;
+      margin-right: 10px;
     }
 
     /* Completion Message */
@@ -99,11 +115,10 @@
       transform: translate(-50%, -50%);
       font-size: 2rem;
       background: rgba(255, 255, 255, 0.9);
-      color: black; /* Center text remains black for emphasis */
+      color: black;
       padding: 30px;
       border-radius: 10px;
       text-align: center;
-      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
       z-index: 20;
     }
 
@@ -111,13 +126,23 @@
       color: #ff7043;
       font-weight: bold;
     }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 15px;
+      margin-top: 30px;
+      color: white;
+      background: #222;
+      border-top: 3px solid #fff;
+    }
   </style>
 </head>
 <body>
   <h1>Robert's 35 Splooge Counter</h1>
   <p id="countdown">Splooges Remaining: 35</p>
 
-  <!-- Columns for To Go and Completed -->
+  <!-- Columns for To-Go and Completed -->
   <div class="container">
     <div class="column" id="to-go-column">
       <h2>To Go</h2>
@@ -127,13 +152,31 @@
     </div>
   </div>
 
+  <!-- Dad-Themed Widgets Section -->
+  <div class="dad-themes">
+    <h2>Random Dad Vibes</h2>
+    <div class="dad-widget">
+      <img src="https://i.imgur.com/kAuAZV3.png" alt="Wrench">
+      <span>Duct tape fixes everything!</span>
+    </div>
+    <div class="dad-widget">
+      <img src="https://i.imgur.com/oYiT2N7.png" alt="Grill">
+      <span>Grill God in action. 🍔</span>
+    </div>
+    <div class="dad-widget">
+      <img src="https://i.imgur.com/VXN9d4F.png" alt="Remote control">
+      <span>Default TV operator 🎮</span>
+    </div>
+  </div>
+
   <!-- Completion Message -->
   <div class="completion-message" id="completion-message">
     Congrats, you're <span>kid free</span>! Pump away, Tiger 🐅 😉!
   </div>
 
-  <!-- Fireworks Canvas -->
-  <canvas id="fireworks-canvas"></canvas>
+  <footer>
+    Dads are the real MVPs! 💪
+  </footer>
 
   <script>
     // Variables
@@ -141,99 +184,31 @@
     const completedColumn = document.getElementById("completed-column");
     const completionMessage = document.getElementById("completion-message");
     const countdown = document.getElementById("countdown");
-    const fireworksCanvas = document.getElementById("fireworks-canvas");
-    const ctx = fireworksCanvas.getContext("2d");
 
     let remainingSplooges = 35;
-    let continuousFireworks = false;
 
-    // Add Splooges to "To Go" Column
+    // Add bubbles to "To Go" column
     for (let i = 1; i <= 35; i++) {
-      const splooge = document.createElement('div');
-      splooge.className = 'bubble';
-      splooge.textContent = `Splooge ${i}`;
-      splooge.dataset.id = i;
-      toGoColumn.appendChild(splooge);
+      const bubble = document.createElement("div");
+      bubble.textContent = `Splooge ${i}`;
+      bubble.dataset.id = i;
+      bubble.className = "bubble";
+      toGoColumn.appendChild(bubble);
     }
 
-    // Resize Fireworks Canvas
-    function resizeCanvas() {
-      fireworksCanvas.width = window.innerWidth;
-      fireworksCanvas.height = window.innerHeight;
-    }
-    window.addEventListener("resize", resizeCanvas);
-    resizeCanvas();
-
-    // Fireworks Effect
-    const particles = [];
-    function createFirework(x, y) {
-      const colors = ['white']; // White fireworks
-      for (let i = 0; i < 50; i++) {
-        particles.push({
-          x,
-          y,
-          radius: Math.random() * 3 + 2,
-          color: colors[0],
-          speedX: (Math.random() - 0.5) * 10,
-          speedY: (Math.random() - 0.5) * 10,
-          alpha: 1,
-        });
-      }
-    }
-
-    function animateFireworks() {
-      ctx.clearRect(0, 0, fireworksCanvas.width, fireworksCanvas.height);
-      particles.forEach((particle, i) => {
-        ctx.beginPath();
-        ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
-        ctx.fillStyle = particle.color;
-        ctx.globalAlpha = particle.alpha;
-        ctx.fill();
-
-        particle.x += particle.speedX;
-        particle.y += particle.speedY;
-        particle.alpha -= 0.02;
-
-        if (particle.alpha <= 0) {
-          particles.splice(i, 1);
-        }
-      });
-
-      if (continuousFireworks) {
-        // Continuously launch random fireworks across the screen
-        createFirework(
-          Math.random() * fireworksCanvas.width,
-          Math.random() * fireworksCanvas.height
-        );
-      }
-
-      requestAnimationFrame(animateFireworks);
-    }
-    animateFireworks();
-
-    // Handle Splooge Clicks
-    document.querySelectorAll(".bubble").forEach(splooge => {
-      splooge.addEventListener("click", () => {
-        const isComplete = splooge.classList.toggle("complete");
+    // Handle Click Logic for Bubbles
+    document.querySelectorAll(".bubble").forEach((bubble) => {
+      bubble.addEventListener("click", () => {
+        const isComplete = bubble.classList.toggle("complete");
         if (isComplete) {
-          completedColumn.appendChild(splooge);
+          completedColumn.appendChild(bubble);
           remainingSplooges--;
         } else {
-          toGoColumn.appendChild(splooge);
+          toGoColumn.appendChild(bubble);
           remainingSplooges++;
         }
-
-        // Update Countdown
         countdown.textContent = `Splooges Remaining: ${remainingSplooges}`;
-
-        // Toggle Completion Message & Fireworks
-        if (remainingSplooges === 0) {
-          completionMessage.style.display = "block";
-          continuousFireworks = true;
-        } else {
-          completionMessage.style.display = "none";
-          continuousFireworks = false;
-        }
+        completionMessage.style.display = remainingSplooges === 0 ? "block" : "none";
       });
     });
   </script>
