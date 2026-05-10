@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Robert's Countdown Goal</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #f4f4f9;
+      color: #333;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      margin-top: 0;
+    }
+
+    #countdown {
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .task {
+      cursor: pointer;
+      font-size: 18px;
+      line-height: 2;
+      margin: 5px auto;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 200px;
+      border: 2px solid #333;
+      border-radius: 8px;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    .task.complete {
+      background-color: #4caf50;
+      color: white;
+    }
+
+    .task:not(.complete):hover {
+      background-color: #e2e8f0;
+    }
+
+    #fireworks {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 10;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>Robert's 35-Task Countdown</h1>
+  <p id="countdown">Tasks Remaining: 35</p>
+  <div id="task-list">
+    <div class="task" data-task-id="1">Task 1</div>
+    <div class="task" data-task-id="2">Task 2</div>
+    <div class="task" data-task-id="3">Task 3</div>
+    <!-- Add more tasks dynamically using JS -->
+  </div>
+
+  <canvas id="fireworks"></canvas>
+
+  <script>
+    // Generate 35 task elements
+    const taskList = document.getElementById('task-list');
+    for (let i = 4; i <= 35; i++) {
+      const taskDiv = document.createElement('div');
+      taskDiv.className = 'task';
+      taskDiv.dataset.taskId = i;
+      taskDiv.textContent = `Task ${i}`;
+      taskList.appendChild(taskDiv);
+    }
+
+    const tasks = document.querySelectorAll('.task');
+    const countdown = document.getElementById('countdown');
+    let remainingTasks = 35;
+
+    tasks.forEach(task => {
+      task.addEventListener('click', () => {
+        const isComplete = task.classList.toggle('complete');
+        remainingTasks += isComplete ? -1 : 1;
+        countdown.textContent = `Tasks Remaining: ${remainingTasks}`;
+
+        if (isComplete) {
+          triggerFireworks();
+        }
+      });
+    });
+
+    // Fireworks Effect
+    const canvas = document.getElementById('fireworks');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const particles = [];
+    const colors = ['#ff595e', '#ffca3a', '#8ac926', '#1982c4', '#6a4c93'];
+
+    function random(min, max) {
+      return Math.random() * (max - min) + min;
+    }
+
+    function createParticles(x, y) {
+      for (let i = 0; i < 50; i++) {
+        particles.push({
+          x,
+          y,
+          radius: random(2, 5),
+          color: colors[Math.floor(Math.random() * colors.length)],
+          speedX: random(-4, 4),
+          speedY: random(-4, 4),
+          alpha: 1
+        });
+      }
+    }
+
+    function drawParticles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      particles.forEach((particle, index) => {
+        ctx.beginPath();
+        ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+        ctx.fillStyle = particle.color;
+        ctx.globalAlpha = particle.alpha;
+        ctx.fill();
+
+        particle.x += particle.speedX;
+        particle.y += particle.speedY;
+        particle.alpha -= 0.02;
+
+        if (particle.alpha <= 0) {
+          particles.splice(index, 1);
+        }
+      });
+
+      requestAnimationFrame(drawParticles);
+    }
+
+    function triggerFireworks() {
+      const x = random(0, canvas.width);
+      const y = random(0, canvas.height / 2); // Fireworks appear in the upper half
+      createParticles(x, y);
+    }
+
+    drawParticles();
+
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+  </script>
+</body>
+</html>
