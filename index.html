@@ -10,7 +10,7 @@
       font-family: 'Arial', sans-serif;
       margin: 0;
       padding: 0;
-      background: linear-gradient(to right, #e3f2fd, #bbdefb);
+      background: linear-gradient(to right, #e1e1e1, #f7f7f7);
       color: #333;
       display: flex;
       flex-direction: column;
@@ -20,74 +20,51 @@
 
     h1 {
       font-size: 2rem;
-      color: #1976d2;
+      color: #333;
       margin-top: 1rem;
     }
 
     #countdown {
       font-size: 1.5rem;
-      margin-bottom: 20px;
+      margin: 20px 0;
     }
 
     /* Splooge Items */
     .splooge {
       cursor: pointer;
       font-size: 1rem;
+      text-align: center;
       line-height: 2;
       margin: 10px auto;
       display: inline-block;
       padding: 10px 20px;
-      background: #1976d2;
+      background: #555;
       color: white;
       border-radius: 30px;
+      text-decoration: none; /* Ensure no underline initially */
       box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
-      transition: background-color 0.3s ease, transform 0.2s ease;
+      transition: background-color 0.3s ease, transform 0.2s;
     }
 
     .splooge.complete {
-      background-color: #4caf50;
-      color: white;
-      transform: scale(1.1);
+      background-color: #555; /* Retain original background color */
+      color: #888; /* Muted gray for completed text */
+      text-decoration: line-through; /* Add strike-through effect */
     }
 
     .splooge:not(.complete):hover {
-      background-color: #1565c0;
+      background-color: #333;
     }
 
-    /* Milk Splash Effect */
-    #milk-splatter {
+    /* Fireworks Canvas */
+    #fireworks-canvas {
       position: fixed;
       top: 0;
       left: 0;
       z-index: 10;
-      width: 100%;
-      height: 100%;
+      width: 100vw;
+      height: 100vh;
       pointer-events: none;
-      overflow: hidden;
-    }
-
-    .milk-splash {
-      position: absolute;
-      background-color: rgba(255, 255, 255, 0.85);
-      border-radius: 50%;
-      animation: splash 0.8s ease-out forwards;
-      transform-origin: center;
-    }
-
-    @keyframes splash {
-      0% {
-        width: 0;
-        height: 0;
-        opacity: 1;
-      }
-      50% {
-        opacity: 0.8;
-      }
-      100% {
-        width: 400px;
-        height: 400px;
-        opacity: 0;
-      }
     }
 
     /* Completion Message */
@@ -114,7 +91,7 @@
     <div class="splooge" data-splooge-id="1">Splooge 1</div>
     <div class="splooge" data-splooge-id="2">Splooge 2</div>
     <div class="splooge" data-splooge-id="3">Splooge 3</div>
-    <!-- Additional splooges will be added dynamically via JavaScript -->
+    <!-- Dynamically generate more splooges in JavaScript -->
   </div>
 
   <!-- Completion Message -->
@@ -122,8 +99,8 @@
     Congrats, you're <span>kid free</span>! Pump away, Tiger 🐅 😉!
   </div>
 
-  <!-- Milk Splatter -->
-  <div id="milk-splatter"></div>
+  <!-- Fireworks Canvas -->
+  <canvas id="fireworks-canvas"></canvas>
 
   <script>
     // Generate 35 splooge elements dynamically
@@ -139,10 +116,65 @@
 
     const splooges = document.querySelectorAll('.splooge');
     const countdown = document.getElementById('countdown');
-    const milkSplatter = document.getElementById('milk-splatter');
+    const fireworksCanvas = document.getElementById('fireworks-canvas');
+    const ctx = fireworksCanvas.getContext('2d');
     let remainingSplooges = 35;
 
-    // Handle Click Events
+    // Resize Canvas for Fireworks
+    function resizeCanvas() {
+      fireworksCanvas.width = window.innerWidth;
+      fireworksCanvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    // Fireworks Effect
+    const particles = [];
+    function createFirework(x, y) {
+      const colors = ['white']; // Fireworks color (white only)
+      for (let i = 0; i < 50; i++) {
+        particles.push({
+          x,
+          y,
+          radius: Math.random() * 3 + 2,
+          color: colors[0],
+          speedX: (Math.random() - 0.5) * 10,
+          speedY: (Math.random() - 0.5) * 10,
+          alpha: 1,
+        });
+      }
+    }
+
+    function animateFireworks() {
+      ctx.clearRect(0, 0, fireworksCanvas.width, fireworksCanvas.height);
+      particles.forEach((particle, i) => {
+        ctx.beginPath();
+        ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+        ctx.fillStyle = particle.color;
+        ctx.globalAlpha = particle.alpha;
+        ctx.fill();
+
+        particle.x += particle.speedX;
+        particle.y += particle.speedY;
+        particle.alpha -= 0.02;
+
+        if (particle.alpha <= 0) {
+          particles.splice(i, 1);
+        }
+      });
+
+      requestAnimationFrame(animateFireworks);
+    }
+    animateFireworks();
+
+    // Fireworks Triggered on Complete
+    function triggerFireworks() {
+      const x = Math.random() * fireworksCanvas.width;
+      const y = Math.random() * fireworksCanvas.height;
+      createFirework(x, y);
+    }
+
+    // Handle Splooge Clicks
     splooges.forEach(splooge => {
       splooge.addEventListener('click', () => {
         const isComplete = splooge.classList.toggle('complete');
@@ -150,34 +182,14 @@
         countdown.textContent = `Splooges Remaining: ${remainingSplooges}`;
 
         if (isComplete) {
-          triggerMilkSplash();
+          triggerFireworks();
         }
 
-        // Show completion message
+        // Show Completion Message
         if (remainingSplooges === 0) {
           completionMessage.style.display = 'block';
         }
       });
-    });
-
-    // Generate Milk Splash Effect
-    function triggerMilkSplash() {
-      const splash = document.createElement('div');
-      splash.className = 'milk-splash';
-      splash.style.left = `${Math.random() * window.innerWidth}px`;
-      splash.style.top = `${Math.random() * window.innerHeight / 2}px`;
-      milkSplatter.appendChild(splash);
-
-      // Remove splash after animation
-      setTimeout(() => {
-        milkSplatter.removeChild(splash);
-      }, 800); // 800ms matches the animation duration
-    }
-
-    // Update Splatter Size on Resize
-    window.addEventListener('resize', () => {
-      milkSplatter.style.width = window.innerWidth + 'px';
-      milkSplatter.style.height = window.innerHeight + 'px';
     });
   </script>
 </body>
