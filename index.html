@@ -1,241 +1,126 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Robert's Countdown Goal</title>
-  <style>
-    /* General Layout */
-    body {
-      font-family: 'Arial', sans-serif;
-      margin: 0;
-      padding: 0;
-      background: linear-gradient(to right, #e1e1e1, #f7f7f7);
-      color: #333;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      height: 100vh;
-      overflow: hidden;
-    }
+<script>
+  // Variables
+  const toGoColumn = document.getElementById("to-go-column");
+  const completedColumn = document.getElementById("completed-column");
+  const completionMessage = document.getElementById("completion-message");
+  const countdown = document.getElementById("countdown");
+  const fireworksCanvas = document.getElementById("fireworks-canvas");
+  const ctx = fireworksCanvas.getContext("2d");
 
-    h1 {
-      font-size: 2rem;
-      color: #333;
-      margin-top: 1rem;
-    }
+  let remainingSplooges = 35;
+  let continuousFireworks = false;
 
-    #countdown {
-      font-size: 1.5rem;
-      margin: 20px 0;
-      color: #333;
-    }
+  // Add Splooges to "To Go" Column
+  for (let i = 1; i <= 35; i++) {
+    const splooge = document.createElement('div');
+    splooge.className = 'bubble';
+    splooge.textContent = `Splooge ${i}`;
+    splooge.dataset.id = i;
+    toGoColumn.appendChild(splooge);
+  }
 
-    /* Task Bubbles and Layout */
-    .container {
-      display: flex;
-      justify-content: center;
-      gap: 30px;
-      width: 90%;
-      max-width: 1200px;
-    }
+  // Resize Fireworks Canvas
+  function resizeCanvas() {
+    fireworksCanvas.width = window.innerWidth;
+    fireworksCanvas.height = window.innerHeight;
+  }
 
-    .column {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 300px;
-    }
+  window.addEventListener("resize", resizeCanvas);
+  resizeCanvas();
 
-    .column h2 {
-      margin-bottom: 10px;
-      font-size: 1.5rem;
-      color: #1976d2; /* Blue header */
-    }
+  // Fireworks
+  const particles = [];
 
-    .bubble {
-      cursor: pointer;
-      font-size: 1rem;
-      text-align: center;
-      line-height: 2;
-      margin: 5px 0;
-      padding: 10px 20px;
-      width: 80%;
-      border-radius: 25px;
-      background-color: #1976d2; /* Blue bubble */
-      color: white; /* White text */
-      box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.2);
-      transition: background-color 0.3s ease, transform 0.2s;
-    }
-
-    .bubble.complete {
-      background-color: #888; /* Grey for completed bubbles */
-      color: white;
-      text-decoration: line-through; /* Strike-through for completed tasks */
-    }
-
-    .bubble:not(.complete):hover {
-      background-color: #1565c0; /* Dark blue hover effect */
-    }
-
-    /* Fireworks Canvas */
-    #fireworks-canvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      z-index: 10;
-      width: 100vw;
-      height: 100vh;
-      pointer-events: none;
-    }
-
-    /* Completion Message */
-    .completion-message {
-      display: none;
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 2rem;
-      background: rgba(255, 255, 255, 0.9);
-      color: #333;
-      padding: 30px;
-      border-radius: 10px;
-      text-align: center;
-      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
-      z-index: 20;
-    }
-
-    .completion-message span {
-      color: #ff7043;
-      font-weight: bold;
-    }
-  </style>
-</head>
-<body>
-  <h1>Robert's 35-Splooge Countdown</h1>
-  <p id="countdown">Splooges Remaining: 35</p>
-
-  <!-- Columns for To Go and Completed -->
-  <div class="container">
-    <div class="column" id="to-go-column">
-      <h2>To Go</h2>
-    </div>
-    <div class="column" id="completed-column">
-      <h2>Completed</h2>
-    </div>
-  </div>
-
-  <!-- Completion Message -->
-  <div class="completion-message" id="completion-message">
-    Congrats, you're <span>kid free</span>! Pump away, Tiger 🐅 😉!
-  </div>
-
-  <!-- Fireworks Canvas -->
-  <canvas id="fireworks-canvas"></canvas>
-
-  <script>
-    // Variables
-    const toGoColumn = document.getElementById("to-go-column");
-    const completedColumn = document.getElementById("completed-column");
-    const completionMessage = document.getElementById("completion-message");
-    const countdown = document.getElementById("countdown");
-    const fireworksCanvas = document.getElementById("fireworks-canvas");
-    const ctx = fireworksCanvas.getContext("2d");
-
-    let remainingSplooges = 35;
-    let continuousFireworks = false;
-
-    // Add Splooges to "To Go" Column
-    for (let i = 1; i <= 35; i++) {
-      const splooge = document.createElement('div');
-      splooge.className = 'bubble';
-      splooge.textContent = `Splooge ${i}`;
-      splooge.dataset.id = i;
-      toGoColumn.appendChild(splooge);
-    }
-
-    // Resize Fireworks Canvas
-    function resizeCanvas() {
-      fireworksCanvas.width = window.innerWidth;
-      fireworksCanvas.height = window.innerHeight;
-    }
-    window.addEventListener("resize", resizeCanvas);
-    resizeCanvas();
-
-    // Fireworks Effect
-    const particles = [];
-    function createFirework(x, y) {
-      const colors = ['white']; // White fireworks
-      for (let i = 0; i < 50; i++) {
-        particles.push({
-          x,
-          y,
-          radius: Math.random() * 3 + 2,
-          color: colors[0],
-          speedX: (Math.random() - 0.5) * 10,
-          speedY: (Math.random() - 0.5) * 10,
-          alpha: 1,
-        });
-      }
-    }
-
-    function animateFireworks() {
-      ctx.clearRect(0, 0, fireworksCanvas.width, fireworksCanvas.height);
-      particles.forEach((particle, i) => {
-        ctx.beginPath();
-        ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
-        ctx.fillStyle = particle.color;
-        ctx.globalAlpha = particle.alpha;
-        ctx.fill();
-
-        particle.x += particle.speedX;
-        particle.y += particle.speedY;
-        particle.alpha -= 0.02;
-
-        if (particle.alpha <= 0) {
-          particles.splice(i, 1);
-        }
+  function createFirework(x, y, amount = 40) {
+    for (let i = 0; i < amount; i++) {
+      particles.push({
+        x,
+        y,
+        radius: Math.random() * 3 + 1,
+        color: "white",
+        speedX: (Math.random() - 0.5) * 8,
+        speedY: (Math.random() - 0.5) * 8,
+        alpha: 1,
+        gravity: 0.03
       });
+    }
+  }
 
-      if (continuousFireworks) {
-        // Continuously launch random fireworks across the screen
+  function animateFireworks() {
+    ctx.clearRect(0, 0, fireworksCanvas.width, fireworksCanvas.height);
+
+    particles.forEach((particle, index) => {
+      ctx.beginPath();
+      ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+
+      ctx.fillStyle = particle.color;
+      ctx.globalAlpha = particle.alpha;
+      ctx.fill();
+
+      particle.x += particle.speedX;
+      particle.y += particle.speedY;
+
+      particle.speedY += particle.gravity;
+      particle.alpha -= 0.02;
+
+      if (particle.alpha <= 0) {
+        particles.splice(index, 1);
+      }
+    });
+
+    ctx.globalAlpha = 1;
+
+    // Continuous fireworks when complete
+    if (continuousFireworks) {
+      if (Math.random() < 0.15) {
         createFirework(
           Math.random() * fireworksCanvas.width,
-          Math.random() * fireworksCanvas.height
+          Math.random() * fireworksCanvas.height,
+          50
         );
       }
-
-      requestAnimationFrame(animateFireworks);
     }
-    animateFireworks();
 
-    // Handle Splooge Clicks
-    document.querySelectorAll(".bubble").forEach(splooge => {
-      splooge.addEventListener("click", () => {
-        const isComplete = splooge.classList.toggle("complete");
-        if (isComplete) {
-          completedColumn.appendChild(splooge);
-          remainingSplooges--;
-        } else {
-          toGoColumn.appendChild(splooge);
-          remainingSplooges++;
-        }
+    requestAnimationFrame(animateFireworks);
+  }
 
-        // Update Countdown
-        countdown.textContent = `Splooges Remaining: ${remainingSplooges}`;
+  animateFireworks();
 
-        // Toggle Completion Message & Fireworks
-        if (remainingSplooges === 0) {
-          completionMessage.style.display = "block";
-          continuousFireworks = true;
-        } else {
-          completionMessage.style.display = "none";
-          continuousFireworks = false;
-        }
-      });
+  // Handle Clicks
+  document.querySelectorAll(".bubble").forEach(splooge => {
+    splooge.addEventListener("click", () => {
+
+      const rect = splooge.getBoundingClientRect();
+
+      const burstX = rect.left + rect.width / 2;
+      const burstY = rect.top + rect.height / 2;
+
+      const isComplete = splooge.classList.toggle("complete");
+
+      if (isComplete) {
+        completedColumn.appendChild(splooge);
+        remainingSplooges--;
+
+        // SHORT FIREWORK BURST
+        createFirework(burstX, burstY, 45);
+
+      } else {
+        toGoColumn.appendChild(splooge);
+        remainingSplooges++;
+      }
+
+      // Update Countdown
+      countdown.textContent =
+        `Splooges Remaining: ${remainingSplooges}`;
+
+      // Final completion mode
+      if (remainingSplooges === 0) {
+        completionMessage.style.display = "block";
+        continuousFireworks = true;
+      } else {
+        completionMessage.style.display = "none";
+        continuousFireworks = false;
+      }
     });
-  </script>
-</body>
-</html>
+  });
+</script>
