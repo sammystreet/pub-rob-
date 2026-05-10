@@ -1,126 +1,42 @@
-<script>
-  // Variables
-  const toGoColumn = document.getElementById("to-go-column");
-  const completedColumn = document.getElementById("completed-column");
-  const completionMessage = document.getElementById("completion-message");
-  const countdown = document.getElementById("countdown");
-  const fireworksCanvas = document.getElementById("fireworks-canvas");
-  const ctx = fireworksCanvas.getContext("2d");
+// Handle Splooge Clicks
+document.querySelectorAll(".bubble").forEach(splooge => {
+  splooge.addEventListener("click", () => {
 
-  let remainingSplooges = 35;
-  let continuousFireworks = false;
+    const isComplete = splooge.classList.toggle("complete");
 
-  // Add Splooges to "To Go" Column
-  for (let i = 1; i <= 35; i++) {
-    const splooge = document.createElement('div');
-    splooge.className = 'bubble';
-    splooge.textContent = `Splooge ${i}`;
-    splooge.dataset.id = i;
-    toGoColumn.appendChild(splooge);
-  }
+    if (isComplete) {
 
-  // Resize Fireworks Canvas
-  function resizeCanvas() {
-    fireworksCanvas.width = window.innerWidth;
-    fireworksCanvas.height = window.innerHeight;
-  }
+      // Move to completed
+      completedColumn.appendChild(splooge);
+      remainingSplooges--;
 
-  window.addEventListener("resize", resizeCanvas);
-  resizeCanvas();
-
-  // Fireworks
-  const particles = [];
-
-  function createFirework(x, y, amount = 40) {
-    for (let i = 0; i < amount; i++) {
-      particles.push({
-        x,
-        y,
-        radius: Math.random() * 3 + 1,
-        color: "white",
-        speedX: (Math.random() - 0.5) * 8,
-        speedY: (Math.random() - 0.5) * 8,
-        alpha: 1,
-        gravity: 0.03
-      });
-    }
-  }
-
-  function animateFireworks() {
-    ctx.clearRect(0, 0, fireworksCanvas.width, fireworksCanvas.height);
-
-    particles.forEach((particle, index) => {
-      ctx.beginPath();
-      ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
-
-      ctx.fillStyle = particle.color;
-      ctx.globalAlpha = particle.alpha;
-      ctx.fill();
-
-      particle.x += particle.speedX;
-      particle.y += particle.speedY;
-
-      particle.speedY += particle.gravity;
-      particle.alpha -= 0.02;
-
-      if (particle.alpha <= 0) {
-        particles.splice(index, 1);
-      }
-    });
-
-    ctx.globalAlpha = 1;
-
-    // Continuous fireworks when complete
-    if (continuousFireworks) {
-      if (Math.random() < 0.15) {
-        createFirework(
-          Math.random() * fireworksCanvas.width,
-          Math.random() * fireworksCanvas.height,
-          50
-        );
-      }
-    }
-
-    requestAnimationFrame(animateFireworks);
-  }
-
-  animateFireworks();
-
-  // Handle Clicks
-  document.querySelectorAll(".bubble").forEach(splooge => {
-    splooge.addEventListener("click", () => {
-
+      // FIREWORK BURST WHEN COMPLETED
       const rect = splooge.getBoundingClientRect();
 
-      const burstX = rect.left + rect.width / 2;
-      const burstY = rect.top + rect.height / 2;
+      createFirework(
+        rect.left + rect.width / 2,
+        rect.top + rect.height / 2
+      );
 
-      const isComplete = splooge.classList.toggle("complete");
+    } else {
 
-      if (isComplete) {
-        completedColumn.appendChild(splooge);
-        remainingSplooges--;
+      // Move back to To Go
+      toGoColumn.appendChild(splooge);
+      remainingSplooges++;
 
-        // SHORT FIREWORK BURST
-        createFirework(burstX, burstY, 45);
+    }
 
-      } else {
-        toGoColumn.appendChild(splooge);
-        remainingSplooges++;
-      }
+    // Update Countdown
+    countdown.textContent = `Splooges Remaining: ${remainingSplooges}`;
 
-      // Update Countdown
-      countdown.textContent =
-        `Splooges Remaining: ${remainingSplooges}`;
+    // Toggle Completion Message & Fireworks
+    if (remainingSplooges === 0) {
+      completionMessage.style.display = "block";
+      continuousFireworks = true;
+    } else {
+      completionMessage.style.display = "none";
+      continuousFireworks = false;
+    }
 
-      // Final completion mode
-      if (remainingSplooges === 0) {
-        completionMessage.style.display = "block";
-        continuousFireworks = true;
-      } else {
-        completionMessage.style.display = "none";
-        continuousFireworks = false;
-      }
-    });
   });
-</script>
+});
