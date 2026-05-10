@@ -1,42 +1,213 @@
-// Handle Splooge Clicks
-document.querySelectorAll(".bubble").forEach(splooge => {
-  splooge.addEventListener("click", () => {
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Robert's Countdown Goal</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to right, #e1e1e1, #f7f7f7);
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
 
-    const isComplete = splooge.classList.toggle("complete");
+    h1 {
+      font-size: 2rem;
+      color: #333;
+      margin-top: 1rem;
+    }
 
-    if (isComplete) {
+    #countdown {
+      font-size: 1.5rem;
+      margin: 20px 0;
+      color: #333;
+    }
 
-      // Move to completed
-      completedColumn.appendChild(splooge);
-      remainingSplooges--;
+    .container {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      width: 90%;
+      max-width: 1200px;
+    }
 
-      // FIREWORK BURST WHEN COMPLETED
-      const rect = splooge.getBoundingClientRect();
+    .column {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 300px;
+    }
 
+    .column h2 {
+      margin-bottom: 10px;
+      font-size: 1.5rem;
+      color: #1976d2;
+    }
+
+    .bubble {
+      cursor: pointer;
+      font-size: 1rem;
+      text-align: center;
+      line-height: 2;
+      margin: 5px 0;
+      padding: 10px 20px;
+      width: 80%;
+      border-radius: 25px;
+      background-color: #1976d2;
+      color: white;
+      box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.2);
+      transition: 0.3s;
+    }
+
+    .bubble.complete {
+      background-color: #888;
+      text-decoration: line-through;
+    }
+
+    .bubble:not(.complete):hover {
+      background-color: #1565c0;
+    }
+
+    #fireworks-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 10;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+    }
+
+    .completion-message {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 2rem;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 30px;
+      border-radius: 10px;
+      z-index: 20;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Robert's 35-Splooge Countdown</h1>
+  <p id="countdown">Splooges Remaining: 35</p>
+
+  <div class="container">
+    <div class="column" id="to-go-column">
+      <h2>To Go</h2>
+    </div>
+
+    <div class="column" id="completed-column">
+      <h2>Completed</h2>
+    </div>
+  </div>
+
+  <div class="completion-message" id="completion-message">
+    Congrats, you're done!
+  </div>
+
+  <canvas id="fireworks-canvas"></canvas>
+
+<script>
+const toGoColumn = document.getElementById("to-go-column");
+const completedColumn = document.getElementById("completed-column");
+const countdown = document.getElementById("countdown");
+const canvas = document.getElementById("fireworks-canvas");
+const ctx = canvas.getContext("2d");
+
+let remaining = 35;
+let particles = [];
+
+function resize() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+window.addEventListener("resize", resize);
+resize();
+
+for (let i = 1; i <= 35; i++) {
+  const div = document.createElement("div");
+  div.className = "bubble";
+  div.textContent = "Task " + i;
+  toGoColumn.appendChild(div);
+}
+
+// ✅ FIREWORK FUNCTION (fixed)
+function createFirework(x, y) {
+  for (let i = 0; i < 40; i++) {
+    particles.push({
+      x,
+      y,
+      vx: (Math.random() - 0.5) * 8,
+      vy: (Math.random() - 0.5) * 8,
+      alpha: 1,
+      size: Math.random() * 3 + 1
+    });
+  }
+}
+
+function animate() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  particles.forEach((p, i) => {
+    ctx.globalAlpha = p.alpha;
+    ctx.fillStyle = "white";
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+    ctx.fill();
+
+    p.x += p.vx;
+    p.y += p.vy;
+    p.alpha -= 0.02;
+
+    if (p.alpha <= 0) particles.splice(i, 1);
+  });
+
+  ctx.globalAlpha = 1;
+  requestAnimationFrame(animate);
+}
+animate();
+
+// ✅ CLICK HANDLER (fireworks added here)
+document.querySelectorAll(".bubble").forEach(bubble => {
+  bubble.addEventListener("click", () => {
+
+    const isDone = bubble.classList.toggle("complete");
+
+    const rect = bubble.getBoundingClientRect();
+
+    if (isDone) {
+      completedColumn.appendChild(bubble);
+      remaining--;
+
+      // 🎆 FIREWORK BURST
       createFirework(
         rect.left + rect.width / 2,
         rect.top + rect.height / 2
       );
 
     } else {
-
-      // Move back to To Go
-      toGoColumn.appendChild(splooge);
-      remainingSplooges++;
-
+      toGoColumn.appendChild(bubble);
+      remaining++;
     }
 
-    // Update Countdown
-    countdown.textContent = `Splooges Remaining: ${remainingSplooges}`;
-
-    // Toggle Completion Message & Fireworks
-    if (remainingSplooges === 0) {
-      completionMessage.style.display = "block";
-      continuousFireworks = true;
-    } else {
-      completionMessage.style.display = "none";
-      continuousFireworks = false;
-    }
-
+    countdown.textContent = "Splooges Remaining: " + remaining;
   });
 });
+</script>
+
+</body>
+</html>
