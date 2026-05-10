@@ -5,47 +5,56 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Robert's Countdown Goal</title>
   <style>
+    /* General Layout */
     body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      background: #f4f4f9;
-      color: #333;
+      font-family: 'Arial', sans-serif;
       margin: 0;
-      padding: 20px;
+      padding: 0;
+      background: linear-gradient(to right, #e3f2fd, #bbdefb);
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100vh;
     }
 
     h1 {
-      margin-top: 0;
+      font-size: 2rem;
+      color: #1976d2;
+      margin-top: 1rem;
     }
 
     #countdown {
-      font-size: 24px;
-      font-weight: bold;
+      font-size: 1.5rem;
+      margin-bottom: 20px;
     }
 
+    /* Splooge Items */
     .splooge {
       cursor: pointer;
-      font-size: 18px;
+      font-size: 1rem;
       line-height: 2;
-      margin: 5px auto;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 200px;
-      border: 2px solid #333;
-      border-radius: 8px;
-      transition: background-color 0.3s, color 0.3s;
+      margin: 10px auto;
+      display: inline-block;
+      padding: 10px 20px;
+      background: #1976d2;
+      color: white;
+      border-radius: 30px;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+      transition: background-color 0.3s ease, transform 0.2s ease;
     }
 
     .splooge.complete {
       background-color: #4caf50;
       color: white;
+      transform: scale(1.1);
     }
 
     .splooge:not(.complete):hover {
-      background-color: #e2e8f0;
+      background-color: #1565c0;
     }
 
+    /* Milk Splash Effect */
     #milk-splatter {
       position: fixed;
       top: 0;
@@ -53,19 +62,19 @@
       z-index: 10;
       width: 100%;
       height: 100%;
-      background: transparent;
       pointer-events: none;
+      overflow: hidden;
     }
 
-    .splatter-animation {
+    .milk-splash {
       position: absolute;
-      background-color: white;
+      background-color: rgba(255, 255, 255, 0.85);
       border-radius: 50%;
-      pointer-events: none;
-      animation: splatter 0.8s ease-out forwards;
+      animation: splash 0.8s ease-out forwards;
+      transform-origin: center;
     }
 
-    @keyframes splatter {
+    @keyframes splash {
       0% {
         width: 0;
         height: 0;
@@ -75,10 +84,26 @@
         opacity: 0.8;
       }
       100% {
-        width: 300px;
-        height: 300px;
+        width: 400px;
+        height: 400px;
         opacity: 0;
       }
+    }
+
+    /* Completion Message */
+    .completion-message {
+      display: none;
+      margin-top: 30px;
+      font-size: 1.5rem;
+      background: #ffccbc;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    .completion-message span {
+      color: #ff7043;
+      font-weight: bold;
     }
   </style>
 </head>
@@ -89,14 +114,21 @@
     <div class="splooge" data-splooge-id="1">Splooge 1</div>
     <div class="splooge" data-splooge-id="2">Splooge 2</div>
     <div class="splooge" data-splooge-id="3">Splooge 3</div>
-    <!-- Add more splooges dynamically using JS -->
+    <!-- Additional splooges will be added dynamically via JavaScript -->
   </div>
 
+  <!-- Completion Message -->
+  <div class="completion-message" id="completion-message">
+    Congrats, you're <span>kid free</span>! Pump away, Tiger 🐅 😉!
+  </div>
+
+  <!-- Milk Splatter -->
   <div id="milk-splatter"></div>
 
   <script>
-    // Generate 35 splooge elements
+    // Generate 35 splooge elements dynamically
     const sploogeList = document.getElementById('splooge-list');
+    const completionMessage = document.getElementById('completion-message');
     for (let i = 4; i <= 35; i++) {
       const sploogeDiv = document.createElement('div');
       sploogeDiv.className = 'splooge';
@@ -110,6 +142,7 @@
     const milkSplatter = document.getElementById('milk-splatter');
     let remainingSplooges = 35;
 
+    // Handle Click Events
     splooges.forEach(splooge => {
       splooge.addEventListener('click', () => {
         const isComplete = splooge.classList.toggle('complete');
@@ -117,25 +150,31 @@
         countdown.textContent = `Splooges Remaining: ${remainingSplooges}`;
 
         if (isComplete) {
-          triggerMilkSplatter();
+          triggerMilkSplash();
+        }
+
+        // Show completion message
+        if (remainingSplooges === 0) {
+          completionMessage.style.display = 'block';
         }
       });
     });
 
-    // Milk Splatter Effect
-    function triggerMilkSplatter() {
-      const splatter = document.createElement('div');
-      splatter.className = 'splatter-animation';
-      splatter.style.left = `${Math.random() * window.innerWidth}px`;
-      splatter.style.top = `${Math.random() * window.innerHeight / 2}px`;
+    // Generate Milk Splash Effect
+    function triggerMilkSplash() {
+      const splash = document.createElement('div');
+      splash.className = 'milk-splash';
+      splash.style.left = `${Math.random() * window.innerWidth}px`;
+      splash.style.top = `${Math.random() * window.innerHeight / 2}px`;
+      milkSplatter.appendChild(splash);
 
-      milkSplatter.appendChild(splatter);
-
+      // Remove splash after animation
       setTimeout(() => {
-        milkSplatter.removeChild(splatter);
-      }, 800); // Remove splatter after animation ends
+        milkSplatter.removeChild(splash);
+      }, 800); // 800ms matches the animation duration
     }
 
+    // Update Splatter Size on Resize
     window.addEventListener('resize', () => {
       milkSplatter.style.width = window.innerWidth + 'px';
       milkSplatter.style.height = window.innerHeight + 'px';
