@@ -27,33 +27,55 @@
     #countdown {
       font-size: 1.5rem;
       margin: 20px 0;
+      color: #333;
     }
 
-    /* Splooge Items */
-    .splooge {
+    /* Columns for Splooges */
+    .container {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      width: 90%;
+      max-width: 1200px;
+    }
+
+    .column {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 300px;
+    }
+
+    .column h2 {
+      margin-bottom: 10px;
+      font-size: 1.5rem;
+      color: #1976d2; /* Blue header */
+    }
+
+    .bubble {
       cursor: pointer;
       font-size: 1rem;
       text-align: center;
       line-height: 2;
-      margin: 10px auto;
-      display: inline-block;
+      margin: 5px 0;
       padding: 10px 20px;
-      background: #555;
-      color: white;
-      border-radius: 30px;
-      text-decoration: none; /* Ensure no underline initially */
-      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+      width: 80%;
+      border-radius: 25px;
+      background-color: #1976d2; /* Blue bubble */
+      color: white; /* White text */
+      box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.2);
       transition: background-color 0.3s ease, transform 0.2s;
     }
 
-    .splooge.complete {
-      background-color: #555; /* Retain original background color */
-      color: #888; /* Muted gray for completed text */
-      text-decoration: line-through; /* Add strike-through effect */
+    .bubble.complete {
+      background-color: #888; /* Grey for completed bubbles */
+      color: white;
+      text-decoration: line-through; /* Strike-through for completed tasks */
     }
 
-    .splooge:not(.complete):hover {
-      background-color: #333;
+    .bubble:not(.complete):hover {
+      background-color: #1565c0; /* Dark blue hover effect */
     }
 
     /* Fireworks Canvas */
@@ -87,11 +109,15 @@
 <body>
   <h1>Robert's 35-Splooge Countdown</h1>
   <p id="countdown">Splooges Remaining: 35</p>
-  <div id="splooge-list">
-    <div class="splooge" data-splooge-id="1">Splooge 1</div>
-    <div class="splooge" data-splooge-id="2">Splooge 2</div>
-    <div class="splooge" data-splooge-id="3">Splooge 3</div>
-    <!-- Dynamically generate more splooges in JavaScript -->
+
+  <!-- Columns for To Go and Completed -->
+  <div class="container">
+    <div class="column" id="to-go-column">
+      <h2>To Go</h2>
+    </div>
+    <div class="column" id="completed-column">
+      <h2>Completed</h2>
+    </div>
   </div>
 
   <!-- Completion Message -->
@@ -103,29 +129,30 @@
   <canvas id="fireworks-canvas"></canvas>
 
   <script>
-    // Generate 35 splooge elements dynamically
-    const sploogeList = document.getElementById('splooge-list');
-    const completionMessage = document.getElementById('completion-message');
-    for (let i = 4; i <= 35; i++) {
-      const sploogeDiv = document.createElement('div');
-      sploogeDiv.className = 'splooge';
-      sploogeDiv.dataset.sploogeId = i;
-      sploogeDiv.textContent = `Splooge ${i}`;
-      sploogeList.appendChild(sploogeDiv);
-    }
-
-    const splooges = document.querySelectorAll('.splooge');
-    const countdown = document.getElementById('countdown');
-    const fireworksCanvas = document.getElementById('fireworks-canvas');
-    const ctx = fireworksCanvas.getContext('2d');
+    // Variables
+    const toGoColumn = document.getElementById("to-go-column");
+    const completedColumn = document.getElementById("completed-column");
+    const completionMessage = document.getElementById("completion-message");
+    const countdown = document.getElementById("countdown");
+    const fireworksCanvas = document.getElementById("fireworks-canvas");
+    const ctx = fireworksCanvas.getContext("2d");
     let remainingSplooges = 35;
 
-    // Resize Canvas for Fireworks
+    // Add Splooges to "To Go" Column
+    for (let i = 1; i <= 35; i++) {
+      const splooge = document.createElement('div');
+      splooge.className = 'bubble';
+      splooge.textContent = `Splooge ${i}`;
+      splooge.dataset.id = i;
+      toGoColumn.appendChild(splooge);
+    }
+
+    // Resize Fireworks Canvas
     function resizeCanvas() {
       fireworksCanvas.width = window.innerWidth;
       fireworksCanvas.height = window.innerHeight;
     }
-    window.addEventListener('resize', resizeCanvas);
+    window.addEventListener("resize", resizeCanvas);
     resizeCanvas();
 
     // Fireworks Effect
@@ -167,7 +194,7 @@
     }
     animateFireworks();
 
-    // Fireworks Triggered on Complete
+    // Fireworks Trigger
     function triggerFireworks() {
       const x = Math.random() * fireworksCanvas.width;
       const y = Math.random() * fireworksCanvas.height;
@@ -175,19 +202,29 @@
     }
 
     // Handle Splooge Clicks
-    splooges.forEach(splooge => {
-      splooge.addEventListener('click', () => {
-        const isComplete = splooge.classList.toggle('complete');
-        remainingSplooges += isComplete ? -1 : 1;
-        countdown.textContent = `Splooges Remaining: ${remainingSplooges}`;
-
+    const bubbles = document.querySelectorAll('.bubble');
+    bubbles.forEach(splooge => {
+      splooge.addEventListener("click", () => {
+        const isComplete = splooge.classList.toggle("complete");
         if (isComplete) {
+          // Move to "Completed" Column
+          completedColumn.appendChild(splooge);
+          remainingSplooges--;
           triggerFireworks();
+        } else {
+          // Move back to "To Go" Column
+          toGoColumn.appendChild(splooge);
+          remainingSplooges++;
         }
 
-        // Show Completion Message
+        // Update Countdown
+        countdown.textContent = `Splooges Remaining: ${remainingSplooges}`;
+
+        // Show Completion Message if All Are Done
         if (remainingSplooges === 0) {
-          completionMessage.style.display = 'block';
+          completionMessage.style.display = "block";
+        } else {
+          completionMessage.style.display = "none";
         }
       });
     });
